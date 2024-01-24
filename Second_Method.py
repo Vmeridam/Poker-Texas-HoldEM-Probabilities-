@@ -1,0 +1,104 @@
+import random
+from collections import Counter
+import numpy as np
+import heapq
+
+def Texas_Holdem_Hands(time):
+    
+    poker = 0
+    full_house = 0
+    three_of_a_kind = 0
+    two_pair = 0
+    pair = 0
+    flush = 0
+    straight = 0
+    straight_royal_flush = 0
+    high_card = 0
+    straight_output = [[1,2,3,4,5],[2,3,4,5,6],[3,4,5,6,7],[4,5,6,7,8],[5,6,7,8,9],
+                       [6,7,8,9,10],[7,8,9,10,11],[8,9,10,11,12],
+                       [9,10,11,12,13],[10,11,12,13,1]]
+    
+    
+    for i in range(time):
+        
+        desk_numbers = (np.arange(1,14,1).tolist())*4
+        random.shuffle(desk_numbers)
+        
+        desk_colors = (np.arange(1,5,1).tolist())*13
+        random.shuffle(desk_colors)
+        
+        player_hand_numbers = Counter((desk_numbers[0],desk_numbers[1], desk_numbers[5],desk_numbers[6],desk_numbers[7],desk_numbers[9],desk_numbers[11]))
+        player_hand_colors = Counter((desk_colors[0],desk_colors[1],desk_colors[5],desk_colors[6],desk_colors[7],desk_colors[9],desk_colors[11]))
+        
+        straight_royal_flush_true = 0
+        high_card_true = 1
+        
+        # dealer_hand = Counter((desk_numbers[2],desk_numbers[3],desk_numbers[5],desk_numbers[6],desk_numbers[7],desk_numbers[9],desk_numbers[11]))
+
+        
+        if max(player_hand_numbers.values()) == 4:
+            poker += 1
+            # print(player_hand_numbers)
+            
+        elif max(player_hand_numbers.values()) == 3:
+            if heapq.nlargest(2, player_hand_numbers.values())[1] == 2:
+                full_house += 1
+                # print(player_hand_numbers)
+            elif max(player_hand_colors.values()) >= 5:
+                flush += 1
+                # print(player_hand_colors,player_hand_numbers)
+            else:
+                three_of_a_kind += +1
+                # print(player_hand_numbers)
+                
+        elif max(player_hand_numbers.values()) == 2:
+            if max(player_hand_colors.values()) >= 5:
+                flush+=1 
+                # print(list(player_hand_numbers.keys()))
+                # print(player_hand_colors)
+            elif heapq.nlargest(2, player_hand_numbers.values())[1] == 2:
+                two_pair += 1
+                # print(player_hand_numbers)
+            else:
+                pair += 1
+                
+                # print(player_hand_numbers)
+
+        
+        elif max(player_hand_numbers.values()) >= 5:
+            player_hand_numbers_list = list(player_hand_numbers.keys())
+            for i in straight_output:
+                if all(x in player_hand_numbers_list for x in i) == True:
+                    straight_royal_flush_true = 1
+                    break
+            
+            if straight_royal_flush_true == 1:
+                straight_royal_flush += 1
+                print(player_hand_numbers_list)
+                print(player_hand_colors)
+            else:
+                flush += 1
+            
+        else:
+            player_hand_numbers_list = list(player_hand_numbers.keys())
+            for i in straight_output:
+                if all(x in player_hand_numbers_list for x in i) == True:
+                    high_card_true = 0
+                    break
+                
+            if high_card_true == 0:
+                straight += 1
+                # print(player_hand_colors, player_hand_numbers_list)
+            else:
+                high_card += 1
+                # print(player_hand_colors, player_hand_numbers_list)
+
+        
+    return print("Straight_Royal_Flush:", straight_royal_flush/100000, "%",
+                 "|Poker:",poker/100000,"%", "|Full_house:",full_house/100000, "%",
+                 "|Flush", flush/100000, "%", "|Straight:",straight/100000,"%",
+                 "|Three_Of_A_Kind:",three_of_a_kind/100000,"%","|Two_pair:",two_pair/100000,"%",
+                 "|Pair:", pair/100000,"%", "|High_Card",high_card/100000,"%")
+
+
+Texas_Holdem_Hands(10000000)
